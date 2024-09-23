@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Beautify with Line Numbers</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            display: flex;
+            width: 80%;
+            height: 80vh;
+            gap: 20px;
+        }
+        .editor-container {
+            display: flex;
+            position: relative;
+            width: 50%;
+            height: 100%;
+        }
+        .line-numbers {
+            text-align: right;
+            padding-right: 10px;
+            font-family: monospace;
+            color: #888;
+            user-select: none;
+            background: #f0f0f0;
+            padding-top: 10px;
+            border: 1px solid #ccc;
+            border-right: none;
+        }
+        textarea {
+            width: calc(100% - 40px);
+            height: 100%;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-left: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+            resize: none;
+        }
+        pre {
+            width: 50%;
+            height: 100%;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f5f5f5;
+            overflow: auto;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #outputJson {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div class="editor-container">
+            <div class="line-numbers" id="lineNumbers"></div>
+            <textarea id="inputJson" placeholder="请输入JSON..." oninput="updateLineNumbers()" onscroll="syncScroll()"></textarea>
+        </div>
+        <pre><code id="outputJson" class="language-json"></code></pre>
+    </div>
+    <button onclick="beautifyJson()">格式化JSON</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script>
+        // Update line numbers when text is changed
+        function updateLineNumbers() {
+            const textarea = document.getElementById('inputJson');
+            const lines = textarea.value.split('\\n').length;
+            const lineNumbers = document.getElementById('lineNumbers');
+            lineNumbers.innerHTML = '';
+            for (let i = 1; i <= lines; i++) {
+                lineNumbers.innerHTML += i + '<br>';
+            }
+        }
+
+        // Sync scrolling between textarea and line numbers
+        function syncScroll() {
+            const textarea = document.getElementById('inputJson');
+            const lineNumbers = document.getElementById('lineNumbers');
+            lineNumbers.scrollTop = textarea.scrollTop;
+        }
+
+        // Beautify JSON function
+        function beautifyJson() {
+            const input = document.getElementById('inputJson').value;
+            const output = document.getElementById('outputJson');
+            try {
+                const json = JSON.parse(input); // Parse input JSON
+                const prettyJson = JSON.stringify(json, null, 4); // Format JSON with 4-space indent
+                output.textContent = prettyJson; // Output formatted JSON
+                Prism.highlightElement(output); // Apply Prism.js highlighting
+                output.style.color = "black"; // Change text color to black
+            } catch (error) {
+                const errorMessage = error.message;
+                output.textContent = '错误: ' + errorMessage; // Show error message
+                output.style.color = "red"; // Change text color to red for errors
+            }
+        }
+
+        // Initialize line numbers
+        updateLineNumbers();
+    </script>
+
+</body>
+</html>
